@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BHQZ Open</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Barlow+Condensed:wght@300;400;500;600;700&family=Barlow:wght@300;400;500&display=swap">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #091509;
+  --surface:  #0e1f10;
+  --card:     #132715;
+  --card2:    #1a3320;
+  --gold:     #c9a84c;
+  --gold2:    #e8c96a;
+  --gold-bg:  rgba(201,168,76,0.10);
+  --gold-bd:  rgba(201,168,76,0.25);
+  --green-hi: #2a5c33;
+  --text:     #ddeede;
+  --muted:    #6d917a;
+  --faint:    rgba(255,255,255,0.04);
+  --line:     rgba(201,168,76,0.15);
+  --win:      #c9a84c;
+  --lose:     #4a6852;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+}
+
+/* ── COURT GRID ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 72px 24px 56px;
+  border-bottom: 1px solid var(--gold-bd);
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  letter-spacing: 5px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.hero-eyebrow::before,
+.hero-eyebrow::after {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 1px;
+  background: var(--gold-bd);
+}
+
+.hero h1 {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(64px, 14vw, 128px);
+  font-weight: 700;
+  letter-spacing: 10px;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.hero-tagline {
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(14px, 2.5vw, 20px);
+  font-weight: 300;
+  letter-spacing: 8px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 40px;
+}
+
+.divider {
+  width: 56px;
+  height: 2px;
+  background: var(--gold);
+  margin: 0 auto 40px;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: clamp(24px, 5vw, 64px);
+  flex-wrap: wrap;
+}
+
+.stat { text-align: center; }
+.stat-n {
+  font-family: 'Oswald', sans-serif;
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--gold);
+  line-height: 1;
+}
+.stat-l {
+  font-family: 'Oswald', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+.hero-trophy {
+  font-size: 48px;
+  margin-bottom: 16px;
+  filter: sepia(100%) saturate(200%) hue-rotate(10deg);
+}
+
+/* ── NAV ── */
+.nav-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--gold-bd);
+}
+.nav {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0 16px;
+}
+.nav::-webkit-scrollbar { display: none; }
+
+.nav-btn {
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 18px 22px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color .2s, border-color .2s;
+}
+.nav-btn:hover { color: var(--text); }
+.nav-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* ── CONTENT ── */
+.content {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 20px 96px;
+}
+
+.cat { display: none; }
+.cat.active { display: block; }
+
+.section-hd {
+  font-family: 'Oswald', sans-serif;
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 12px;
+  margin-bottom: 28px;
+  margin-top: 48px;
+}
+.section-hd:first-child { margin-top: 0; }
+
+/* ── GROUP CARDS ── */
+.groups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.group-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+
+.group-hd {
+  font-family: 'Oswald', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.group-hd::before {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 6px;
+  background: var(--gold);
+  transform: rotate(45deg);
+}
+
+.player-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  gap: 8px;
+}
+.player-row:last-child { border-bottom: none; }
+
+.p-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.p-name.w { color: var(--gold); }
+
+.badge {
+  font-family: 'Oswald', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 3px 7px;
+  flex-shrink: 0;
+}
+.badge-w {
+  background: var(--gold-bg);
+  color: var(--gold);
+  border: 1px solid var(--gold-bd);
+}
+.badge-l {
+  background: rgba(255,255,255,0.03);
+  color: var(--muted);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* ── BRACKET ── */
+.bracket-scroll { overflow-x: auto; padding-bottom: 12px; }
+
+.bracket {
+  display: flex;
+  align-items: stretch;
+  min-width: 640px;
+  gap: 0;
+}
+
+.bround {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  flex: 1;
+  position: relative;
+}
+
+.bround-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+  padding: 10px 0 16px;
+  flex-shrink: 0;
+}
+
+.bmatches {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  flex: 1;
+  padding: 0 12px;
+}
+
+.bmatch {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  flex: 1;
+  justify-content: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(201,168,76,0.12);
+}
+.bmatch:last-child { border-bottom: none; }
+
+.bplayer {
+  background: #1c3320;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-bottom: none;
+  padding: 10px 14px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bplayer:last-of-type {
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.bplayer.tbd {
+  color: var(--muted);
+  font-style: italic;
+  font-weight: 300;
+  border-color: rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.02);
+}
+.bplayer.winner {
+  background: var(--gold-bg);
+  border-color: var(--gold);
+  color: var(--gold);
+  font-weight: 700;
+}
+.bplayer.champion {
+  background: linear-gradient(135deg, rgba(201,168,76,0.2), rgba(201,168,76,0.05));
+  border: 2px solid var(--gold);
+  color: var(--gold2);
+  font-size: 15px;
+  font-weight: 700;
+  padding: 12px 16px;
+}
+
+.connector {
+  width: 28px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+}
+.connector svg {
+  width: 28px;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* champion box */
+.champion-box {
+  background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.04));
+  border: 2px solid var(--gold);
+  padding: 20px 28px;
+  text-align: center;
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.champ-icon { font-size: 28px; }
+.champ-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.champ-name {
+  font-family: 'Oswald', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+
+/* 4-player bracket special layout */
+.bracket4 {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-width: 560px;
+}
+
+.b4-round {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  padding: 0 8px;
+}
+
+.b4-label {
+  font-family: 'Oswald', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+  padding: 0 8px 14px;
+  flex-shrink: 0;
+}
+
+.b4-match {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  justify-content: center;
+}
+
+/* ── FOOTER ── */
+footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--gold-bd);
+  padding: 32px 24px;
+  text-align: center;
+}
+.footer-logo {
+  font-family: 'Oswald', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 6px;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.footer-sub {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 2px;
+}
+
+/* ── PLAYERS LIST ── */
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+.player-chip {
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 10px 14px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.player-chip::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  background: var(--muted);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.player-chip.seed1::before { background: var(--gold); width: 6px; height: 6px; }
+
+/* ── ROUND ROBIN RESULT TABLE ── */
+.rr-note {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 24px;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rr-note::before { content: '•'; color: var(--gold); }
+
+/* standings inside group card */
+.rr-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.rr-row:last-child { border-bottom: none; }
+.rr-row.leader { background: rgba(201,168,76,0.05); }
+.rr-pos {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  color: var(--muted);
+  width: 14px;
+  flex-shrink: 0;
+}
+.rr-row.leader .rr-pos { color: var(--gold); }
+.rr-pname {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rr-row.leader .rr-pname { color: var(--gold); }
+.rr-wins {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.rr-row.leader .rr-wins { color: var(--gold); }
+.badge-cls {
+  font-family: 'Oswald', sans-serif;
+  font-size: 9px;
+  letter-spacing: 1px;
+  padding: 2px 6px;
+  background: var(--gold-bg);
+  color: var(--gold);
+  border: 1px solid var(--gold-bd);
+  flex-shrink: 0;
+}
+
+/* match results sub-section */
+.rr-matches {
+  border-top: 1px solid var(--line);
+  padding: 10px 16px 12px;
+  background: rgba(0,0,0,0.15);
+}
+.match-sub-hd {
+  font-family: 'Oswald', sans-serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.rr-match {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 3px 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.rr-match .mw { color: var(--text); font-weight: 600; }
+.rr-match .mvsep {
+  font-size: 10px;
+  color: var(--muted);
+  margin: 0 2px;
+  opacity: 0.5;
+}
+
+/* bracket player states */
+.bplayer.won {
+  background: rgba(201,168,76,0.13);
+  border-color: rgba(201,168,76,0.55) !important;
+  color: var(--gold);
+  font-weight: 700;
+}
+.bplayer.won::after {
+  content: ' ✓';
+  font-size: 11px;
+  opacity: 0.9;
+}
+.bplayer.lost {
+  background: rgba(160,60,60,0.18);
+  border-color: rgba(180,80,80,0.45) !important;
+  color: #c49090;
+  font-weight: 400;
+}
+.bplayer.lost::after {
+  content: ' ✗';
+  font-size: 11px;
+  color: #c47070;
+  opacity: 0.8;
+}
+.bplayer.wo {
+  background: rgba(120,80,40,0.18);
+  border-color: rgba(160,110,50,0.4) !important;
+  color: #b09060;
+}
+.bplayer.wo::after {
+  content: ' W/O';
+  font-size: 10px;
+  font-style: italic;
+  color: #a08050;
+}
+.bplayer.champ-final {
+  background: linear-gradient(135deg, rgba(201,168,76,0.25), rgba(201,168,76,0.08));
+  border: 2px solid var(--gold) !important;
+  color: var(--gold2);
+  font-weight: 700;
+  font-size: 14px;
+}
+.bplayer.champ-final::after {
+  content: ' 🏆';
+}
+
+@media (max-width: 600px) {
+  .hero h1 { font-size: 56px; }
+  .groups-grid { grid-template-columns: 1fr 1fr; }
+  .hero-stats { gap: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-eyebrow">Torneo de Tenis · Categorías Avanzado</div>
+  <div class="hero-trophy">🎾</div>
+  <h1>BHQZ</h1>
+  <p class="hero-tagline">Open · Tennis Tournament</p>
+  <div class="divider"></div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-n">4</div><div class="stat-l">Categorías</div></div>
+    <div class="stat"><div class="stat-n">45+</div><div class="stat-l">Jugadores</div></div>
+    <div class="stat"><div class="stat-n">16</div><div class="stat-l">Grupos RR</div></div>
+    <div class="stat"><div class="stat-n">3</div><div class="stat-l">Cuadros</div></div>
+  </div>
+</header>
+
+<!-- NAV -->
+<div class="nav-wrap">
+  <nav class="nav" id="mainNav">
+    <button class="nav-btn active" onclick="showCat(0)">Avanzado</button>
+    <button class="nav-btn" onclick="showCat(1)">Segunda Categoría</button>
+    <button class="nav-btn" onclick="showCat(2)">Tercera Categoría</button>
+    <button class="nav-btn" onclick="showCat(3)">Cuarta Categoría</button>
+  </nav>
+</div>
+
+<!-- CONTENT -->
+<main class="content">
+
+  <!-- ── AVANZADO ── -->
+  <section class="cat active" id="cat0">
+
+    <div class="section-hd">Fase de Grupos — Round Robin</div>
+    <div class="rr-note">Los primeros de cada grupo clasifican al cuadro principal</div>
+
+    <div class="groups-grid">
+
+      <!-- Grupo A -->
+      <div class="group-card">
+        <div class="group-hd">Grupo A</div>
+        <div class="rr-row leader">
+          <span class="rr-pos">1</span><span class="rr-pname">Oscar Mayorga</span><span class="rr-wins">2G</span><span class="badge-cls">Clasif.</span>
+        </div>
+        <div class="rr-row">
+          <span class="rr-pos">2</span><span class="rr-pname">Daniel Rodriguez</span><span class="rr-wins">0G</span>
+        </div>
+        <div class="rr-row">
+          <span class="rr-pos">3</span><span class="rr-pname">Lucia Cervantes</span><span class="rr-wins">0G</span>
+        </div>
+        <div class="rr-matches">
+          <div class="match-sub-hd">Partidos</div>
+          <div class="rr-match"><span class="mw">O. Mayorga</span><span class="mvsep"> def. </span>D. Rodriguez</div>
+          <div class="rr-match"><span class="mw">O. Mayorga</span><span class="mvsep"> def. </span>L. Cervantes</div>
+          <div class="rr-match"><span class="mw">D. Rodriguez</span><span class="mvsep"> def. </span>L. Cervantes</div>
+        </div>
+      </div>
+
+      <!-- Grupo B -->
+      <div class="group-card">
+        <div class="group-hd">Grupo B</div>
+        <div class="rr-row leader">
+          <span class="rr-pos">1</span><span class="rr-pname">Yesid Rivera</span><span class="rr-wins">2G</span><span class="badge-cls">Clasif.</span>
+        </div>
+        <div class="rr-row">
+          <span class="rr-pos">2</span><span class="rr-pname">Alejandro Escobar</span><span class="rr-wins">1G</span>
+        </div>
+        <div class="rr-row">
+          <span class="rr-pos">3</span><span class="rr-pname">Miguel Cendales</span><span class="rr-wins">0G</span>
+        </div>
+        <div class="rr-matches">
+          <div class="match-sub-hd">Partidos</div>
+          <div class="rr-match"><span class="mw">Y. Rivera</span><span class="mvsep"> def. </span>M. Cendales</div>
+          <div class="rr-match"><span class="mw">Y. Rivera</span><span class="mvsep"> def. </span>A. Escobar</div>
+          <div class="rr-match"><span class="mw">A. Escobar</span><span class="mvsep"> def. </span>M. Cendales</div>
+        </div>
+      </div>
+
+      <!-- Grupo C -->
+      <div class="group-card">
+        <div class="group-hd">Grupo C</div>
+        <div class="rr-row leader">
+          <span class="rr-pos">1</span><span class="rr-pname">Camilo Erazo</span><span class="rr-wins">2G</span><span class="badge-cls">Clasif.</span>
+        </div>
+        <div class="rr-row">
+          <span class="rr-pos">2</span><span class="rr-pname">Sergio Galvis</span><span class="rr-wins">1G</span>
+        </div>
+        <div class="rr-row">
+          <span class="rr-pos">3</span><span class="rr-pname">Carolina Manrique</span><span class="rr-wins">0G</span>
+        </div>
+        <div class="rr-matches">
+          <div class="match-sub-hd">Partidos</div>
+          <div class="rr-match"><span class="mw">C. Erazo</span><span class="mvsep"> def. </span>S. Galvis</div>
+          <div class="rr-match"><span class="mw">C. Erazo</span><span class="mvsep"> def. </span>C. Manrique</div>
+          <div class="rr-match"><span class="mw">S. Galvis</span><span class="mvsep"> def. </span>C. Manrique</div>
+        </div>
+      </div>
+
+      <!-- Grupo D -->
+      <div class="group-card">
+        <div class="group-hd">Grupo D</div>
+        <div class="rr-row leader">
+          <span class="rr-pos">1</span><span class="rr-pname">Julio Becerra</span><span class="rr-wins">1G</span><span class="badge-cls">Clasif.</span>
+        </div>
+        <div class="rr-row">
+          <span class="rr-pos">2</span><span class="rr-pname">Oscar Marin</span><span class="rr-wins">0G</span>
+        </div>
+        <div class="rr-matches">
+          <div class="match-sub-hd">Partidos</div>
+          <div class="rr-match"><span class="mw">J. Becerra</span><span class="mvsep"> def. </span>O. Marin</div>
+        </div>
+      </div>
+
+      <!-- Grupo E -->
+      <div class="group-card">
+        <div class="group-hd">Grupo E</div>
+        <div class="rr-row leader">
+          <span class="rr-pos">1</span><span class="rr-pname">Fabricio Diaz</span><span class="rr-wins">2G</span><span class="badge-cls">Clasif.</span>
+        </div>
+        <div class="rr-row">
+          <span class="rr-pos">2</span><span class="rr-pname">Salome Gomez</span><span class="rr-wins">1G</span>
+        </div>
+        <div class="rr-row">
+          <span class="rr-pos">3</span><span class="rr-pname">Isabella Cepeda</span><span class="rr-wins">0G</span>
+        </div>
+        <div class="rr-matches">
+          <div class="match-sub-hd">Partidos</div>
+          <div class="rr-match"><span class="mw">F. Diaz</span><span class="mvsep"> def. </span>S. Gomez</div>
+          <div class="rr-match"><span class="mw">F. Diaz</span><span class="mvsep"> def. </span>I. Cepeda</div>
+          <div class="rr-match"><span class="mw">S. Gomez</span><span class="mvsep"> def. </span>I. Cepeda</div>
+        </div>
+      </div>
+
+      <!-- Grupo F -->
+      <div class="group-card">
+        <div class="group-hd">Grupo F</div>
+        <div class="rr-row leader">
+          <span class="rr-pos">1</span><span class="rr-pname">Ricardo Blanco</span><span class="rr-wins">2G</span><span class="badge-cls">Clasif.</span>
+        </div>
+        <div class="rr-row">
+          <span class="rr-pos">2</span><span class="rr-pname">Andres Nino</span><span class="rr-wins">1G</span>
+        </div>
+        <div class="rr-row">
+          <span class="rr-pos">3</span><span class="rr-pname">Alan Sanchez</span><span class="rr-wins">0G</span>
+        </div>
+        <div class="rr-matches">
+          <div class="match-sub-hd">Partidos</div>
+          <div class="rr-match"><span class="mw">R. Blanco</span><span class="mvsep"> def. </span>A. Nino</div>
+          <div class="rr-match"><span class="mw">R. Blanco</span><span class="mvsep"> def. </span>A. Sanchez</div>
+          <div class="rr-match"><span class="mw">A. Nino</span><span class="mvsep"> def. </span>A. Sanchez</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section-hd">Cuadro Principal — 8 Jugadores</div>
+
+    <div class="bracket-scroll">
+      <div class="bracket" id="bracket8">
+
+        <!-- QF -->
+        <div class="bround">
+          <div class="bround-label">Cuartos de Final</div>
+          <div class="bmatches">
+            <div class="bmatch" style="flex:1">
+              <div class="bplayer lost">Daniel Rodriguez</div>
+              <div class="bplayer won">Yesid Rivera</div>
+            </div>
+            <div class="bmatch" style="flex:1">
+              <div class="bplayer won">Oscar Mayorga</div>
+              <div class="bplayer lost">Salome Gomez</div>
+            </div>
+            <div class="bmatch" style="flex:1">
+              <div class="bplayer" style="background:rgba(0,0,0,0.2);border-color:rgba(255,255,255,0.05);color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.2)">Fabricio Diaz <span style="font-size:10px;font-style:italic;text-decoration:none">(W/O)</span></div>
+              <div class="bplayer won">Camilo Erazo</div>
+            </div>
+            <div class="bmatch" style="flex:1">
+              <div class="bplayer won">Ricardo Blanco</div>
+              <div class="bplayer lost">Julio Becerra</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- connector QF to SF -->
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:space-around;width:32px;flex-shrink:0;padding-top:40px">
+          <svg viewBox="0 0 32 80" style="width:32px;height:80px;flex:1"><polyline points="0,20 14,20 14,60 32,60" fill="none" stroke="rgba(201,168,76,0.4)" stroke-width="1.5"/></svg>
+          <svg viewBox="0 0 32 80" style="width:32px;height:80px;flex:1"><polyline points="0,20 14,20 14,60 32,60" fill="none" stroke="rgba(201,168,76,0.4)" stroke-width="1.5"/></svg>
+        </div>
+
+        <!-- SF -->
+        <div class="bround">
+          <div class="bround-label">Semifinales</div>
+          <div class="bmatches">
+            <div class="bmatch" style="flex:1">
+              <div class="bplayer lost">Yesid Rivera</div>
+              <div class="bplayer won">Ricardo Blanco</div>
+            </div>
+            <div class="bmatch" style="flex:1">
+              <div class="bplayer won">Oscar Mayorga</div>
+              <div class="bplayer lost">Camilo Erazo</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- connector SF to Final -->
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:32px;flex-shrink:0;padding-top:40px">
+          <svg viewBox="0 0 32 200" style="width:32px;height:160px"><polyline points="0,50 14,50 14,150 32,150" fill="none" stroke="rgba(201,168,76,0.4)" stroke-width="1.5"/></svg>
+        </div>
+
+        <!-- Final -->
+        <div class="bround" style="max-width:200px">
+          <div class="bround-label">Final</div>
+          <div class="bmatches">
+            <div class="bmatch" style="flex:1">
+              <div class="bplayer" style="background:linear-gradient(135deg,rgba(201,168,76,0.25),rgba(201,168,76,0.08));border:2px solid var(--gold);color:var(--gold2);font-weight:700;font-size:14px">Ricardo Blanco &#127942;</div>
+              <div class="bplayer lost">Oscar Mayorga</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Champion box -->
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 0 0 12px">
+          <div class="champion-box">
+            <div class="champ-icon">&#127942;</div>
+            <div class="champ-label">Campeon</div>
+            <div class="champ-name">Ricardo Blanco</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="section-hd" style="margin-top:48px">Participantes Cuadro Principal</div>
+    <div class="players-grid">
+      <div class="player-chip seed1">Ricardo Blanco</div>
+      <div class="player-chip seed1">Oscar Mayorga</div>
+      <div class="player-chip seed1">Yesid Rivera</div>
+      <div class="player-chip seed1">Camilo Erazo</div>
+      <div class="player-chip">Daniel Rodriguez</div>
+      <div class="player-chip">Julio Becerra</div>
+      <div class="player-chip">Salome Gomez</div>
+      <div class="player-chip">Fabricio Diaz</div>
+    </div>
+
+  </section>
+
+    <!-- ── SEGUNDA CATEGORÍA ── -->
+  <section class="cat" id="cat1">
+
+    <div class="section-hd">Fase de Grupos — Round Robin</div>
+    <div class="rr-note">Los primeros de cada grupo clasifican al cuadro principal</div>
+
+    <div class="groups-grid">
+
+      <div class="group-card">
+        <div class="group-hd">Grupo A</div>
+        <div class="player-row"><span class="p-name w">Antonia Arbelaez</span><span class="badge badge-w">1º</span></div>
+        <div class="player-row"><span class="p-name">Valeria Lopez</span><span class="badge badge-l">2º</span></div>
+      </div>
+
+      <div class="group-card">
+        <div class="group-hd">Grupo B</div>
+        <div class="player-row"><span class="p-name w">Miguel Ramirez</span><span class="badge badge-w">1º</span></div>
+        <div class="player-row"><span class="p-name">Samuel Prieto</span><span class="badge badge-l">2º</span></div>
+      </div>
+
+      <div class="group-card">
+        <div class="group-hd">Grupo C</div>
+        <div class="player-row"><span class="p-name w">Julieta Bustos</span><span class="badge badge-w">1º</span></div>
+        <div class="player-row"><span class="p-name">Alisson Gomez</span><span class="badge badge-l">2º</span></div>
+      </div>
+
+      <div class="group-card">
+        <div class="group-hd">Grupo D</div>
+        <div class="player-row"><span class="p-name w">Tomas Sandoval</span><span class="badge badge-w">1º</span></div>
+        <div class="player-row"><span class="p-name">Jorge Lugo</span><span class="badge badge-l">2º</span></div>
+      </div>
+
+    </div>
+
+    <div class="section-hd">Cuadro Principal — 4 Jugadores</div>
+
+    <div class="bracket-scroll">
+      <div class="bracket4">
+
+        <!-- Semifinal -->
+        <div style="flex:1; padding: 0 8px;">
+          <div class="b4-label">Semifinal</div>
+          <div style="display:flex;flex-direction:column;gap:32px">
+            <div class="b4-match">
+              <div class="bplayer">(A) Julieta Bustos</div>
+              <div class="bplayer">(B) Antonia Arbelaez</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Arrow -->
+        <svg viewBox="0 0 28 40" style="width:28px;height:40px;flex-shrink:0;margin-top:30px"><line x1="0" y1="20" x2="28" y2="20" stroke="rgba(201,168,76,0.4)" stroke-width="1"/><polygon points="24,16 28,20 24,24" fill="rgba(201,168,76,0.4)"/></svg>
+
+        <!-- Final -->
+        <div style="flex:1; padding: 0 8px;">
+          <div class="b4-label">Final</div>
+          <div class="b4-match">
+            <div class="bplayer tbd">Ganador SF</div>
+            <div class="bplayer">(C) Tomas Sabogal</div>
+          </div>
+        </div>
+
+        <!-- Arrow -->
+        <svg viewBox="0 0 28 40" style="width:28px;height:40px;flex-shrink:0;margin-top:30px"><line x1="0" y1="20" x2="28" y2="20" stroke="rgba(201,168,76,0.4)" stroke-width="1"/><polygon points="24,16 28,20 24,24" fill="rgba(201,168,76,0.4)"/></svg>
+
+        <!-- Champion -->
+        <div style="padding: 0 0 0 8px; display:flex; align-items:center; justify-content:center">
+          <div class="champion-box">
+            <div class="champ-icon">🏆</div>
+            <div class="champ-label">Campeón</div>
+            <div class="champ-name">Por definir</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="section-hd" style="margin-top:48px">Todos los participantes</div>
+    <div class="players-grid">
+      <div class="player-chip seed1">Julieta Bustos</div>
+      <div class="player-chip seed1">Antonia Arbelaez</div>
+      <div class="player-chip seed1">Tomas Sandoval</div>
+      <div class="player-chip seed1">Miguel Ramirez</div>
+      <div class="player-chip">Valeria Lopez</div>
+      <div class="player-chip">Samuel Prieto</div>
+      <div class="player-chip">Alisson Gomez</div>
+      <div class="player-chip">Jorge Lugo</div>
+    </div>
+
+  </section>
+
+  <!-- ── TERCERA CATEGORÍA ── -->
+  <section class="cat" id="cat2">
+
+    <div class="section-hd">Fase de Grupos — Round Robin</div>
+    <div class="rr-note">Los primeros de cada grupo clasifican al cuadro principal</div>
+
+    <div class="groups-grid">
+
+      <div class="group-card">
+        <div class="group-hd">Grupo A</div>
+        <div class="player-row"><span class="p-name w">Valery Padilla</span><span class="badge badge-w">1º</span></div>
+        <div class="player-row"><span class="p-name">Adriana Santa Fe</span><span class="badge badge-l">2º</span></div>
+        <div class="player-row"><span class="p-name">Sara Trujillo</span><span class="badge badge-l">3º</span></div>
+      </div>
+
+      <div class="group-card">
+        <div class="group-hd">Grupo B</div>
+        <div class="player-row"><span class="p-name w">Luis Carlos Cuartas</span><span class="badge badge-w">1º</span></div>
+        <div class="player-row"><span class="p-name">Luciana Ramirez</span><span class="badge badge-l">2º</span></div>
+        <div class="player-row"><span class="p-name">Sergio Santana</span><span class="badge badge-l">3º</span></div>
+      </div>
+
+      <div class="group-card">
+        <div class="group-hd">Grupo C</div>
+        <div class="player-row"><span class="p-name w">Miguel Pedraza</span><span class="badge badge-w">1º</span></div>
+        <div class="player-row"><span class="p-name">Dilan Medina</span><span class="badge badge-l">2º</span></div>
+        <div class="player-row"><span class="p-name">Valeria Galvis</span><span class="badge badge-l">3º</span></div>
+      </div>
+
+    </div>
+
+    <div class="section-hd">Cuadro Principal — 4 Jugadores</div>
+
+    <div class="bracket-scroll">
+      <div class="bracket4">
+
+        <div style="flex:1; padding: 0 8px;">
+          <div class="b4-label">Semifinal</div>
+          <div style="display:flex;flex-direction:column;gap:32px">
+            <div class="b4-match">
+              <div class="bplayer">(A) Valery Padilla</div>
+              <div class="bplayer">(B) Miguel Pedraza</div>
+            </div>
+          </div>
+        </div>
+
+        <svg viewBox="0 0 28 40" style="width:28px;height:40px;flex-shrink:0;margin-top:30px"><line x1="0" y1="20" x2="28" y2="20" stroke="rgba(201,168,76,0.4)" stroke-width="1"/><polygon points="24,16 28,20 24,24" fill="rgba(201,168,76,0.4)"/></svg>
+
+        <div style="flex:1; padding: 0 8px;">
+          <div class="b4-label">Final</div>
+          <div class="b4-match">
+            <div class="bplayer tbd">Ganador SF</div>
+            <div class="bplayer">(C) Luis Carlos Cuartas</div>
+          </div>
+        </div>
+
+        <svg viewBox="0 0 28 40" style="width:28px;height:40px;flex-shrink:0;margin-top:30px"><line x1="0" y1="20" x2="28" y2="20" stroke="rgba(201,168,76,0.4)" stroke-width="1"/><polygon points="24,16 28,20 24,24" fill="rgba(201,168,76,0.4)"/></svg>
+
+        <div style="padding: 0 0 0 8px; display:flex; align-items:center; justify-content:center">
+          <div class="champion-box">
+            <div class="champ-icon">🏆</div>
+            <div class="champ-label">Campeón</div>
+            <div class="champ-name">Por definir</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="section-hd" style="margin-top:48px">Todos los participantes</div>
+    <div class="players-grid">
+      <div class="player-chip seed1">Valery Padilla</div>
+      <div class="player-chip seed1">Miguel Pedraza</div>
+      <div class="player-chip seed1">Luis Carlos Cuartas</div>
+      <div class="player-chip">Luciana Ramirez</div>
+      <div class="player-chip">Adriana Santa Fe</div>
+      <div class="player-chip">Sara Trujillo</div>
+      <div class="player-chip">Dilan Medina</div>
+      <div class="player-chip">Valeria Galvis</div>
+      <div class="player-chip">Sergio Santana</div>
+    </div>
+
+  </section>
+
+  <!-- ── CUARTA CATEGORÍA ── -->
+  <section class="cat" id="cat3">
+
+    <div class="section-hd">Fase de Grupos — Round Robin</div>
+    <div class="rr-note">Todos los jugadores compiten en round robin</div>
+
+    <div class="groups-grid">
+
+      <div class="group-card">
+        <div class="group-hd">Grupo A</div>
+        <div class="player-row"><span class="p-name w">Nicolas Niño</span><span class="badge badge-w">1º</span></div>
+        <div class="player-row"><span class="p-name">Victor Manrique</span><span class="badge badge-l">2º</span></div>
+        <div class="player-row"><span class="p-name">Miguel Pedraza Jr</span><span class="badge badge-l">3º</span></div>
+      </div>
+
+      <div class="group-card">
+        <div class="group-hd">Grupo B</div>
+        <div class="player-row"><span class="p-name">Maria Torres</span><span class="badge badge-l">—</span></div>
+        <div class="player-row"><span class="p-name">Ariana Quintero</span><span class="badge badge-l">—</span></div>
+      </div>
+
+    </div>
+
+    <div class="section-hd" style="margin-top:48px">Todos los participantes</div>
+    <div class="players-grid">
+      <div class="player-chip seed1">Nicolas Niño</div>
+      <div class="player-chip">Victor Manrique</div>
+      <div class="player-chip">Miguel Pedraza Jr</div>
+      <div class="player-chip">Maria Torres</div>
+      <div class="player-chip">Ariana Quintero</div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-logo">BHQZ OPEN</div>
+  <div class="footer-sub">Tennis Tournament · Todos los derechos reservados</div>
+</footer>
+
+<script>
+function showCat(idx) {
+  document.querySelectorAll('.cat').forEach((s, i) => {
+    s.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.nav-btn').forEach((b, i) => {
+    b.classList.toggle('active', i === idx);
+  });
+}
+</script>
+</body>
+</html>
